@@ -11,12 +11,12 @@ using WebService;
 
 namespace AutoUpdateDLL
 {
-    public class AutoUpdateDLL : IAutoUpdateDLL
+    public class SQLServer_AutoUpdateDLL : IAutoUpdateDLL
     {
         private string ConnectString;
         private string Dir;
 
-        public AutoUpdateDLL(string _connectstring, string dir)
+        public SQLServer_AutoUpdateDLL(string _connectstring, string dir)
         {
             ConnectString = _connectstring;
             if (String.IsNullOrEmpty(dir))
