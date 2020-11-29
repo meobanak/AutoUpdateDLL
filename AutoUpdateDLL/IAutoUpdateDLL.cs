@@ -9,6 +9,5 @@ namespace AutoUpdateDLL
     public interface IAutoUpdateDLL
     {
         void GetDLLs();
-        void DecodeStringBase64ToFile(string b64Str, string path);
     }
 }

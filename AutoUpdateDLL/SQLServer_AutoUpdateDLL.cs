@@ -42,7 +42,7 @@ namespace AutoUpdateDLL
         }
 
 
-        public void DecodeStringBase64ToFile(string b64Str, string path)
+        private void DecodeStringBase64ToFile(string b64Str, string path)
         {
             Byte[] bytes = Convert.FromBase64String(b64Str);
             File.WriteAllBytes(path, bytes);
