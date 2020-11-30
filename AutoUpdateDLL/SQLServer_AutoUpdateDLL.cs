@@ -17,10 +17,10 @@ namespace AutoUpdateDLL
         private string ConnectString;
         private string Dir;
 
-        public SQLServer_AutoUpdateDLL(string _connectstring, string dir)
+        public SQLServer_AutoUpdateDLL(string _connectstring, string dir = null)
         {
             ConnectString = _connectstring;
-            if (String.IsNullOrEmpty(dir))
+            if (!String.IsNullOrEmpty(dir))
                 Dir = dir;
             else
                 Dir = Directory.GetCurrentDirectory();
@@ -39,19 +39,22 @@ namespace AutoUpdateDLL
 
                 foreach (string myFile in myFiles)
                 {
-                    var info = myFile.GetInfoDLL();
-                    
-                    if(result
-                        .AsEnumerable()
-                        .Any(a => a["OriginalFileName"].ToString() == info["OriginalFileName"].ToString() 
-                         && a["Version"].ToString().ConvertAssemblyVersionToInt() == info["OriginalFileName"].ToString().ConvertAssemblyVersionToInt()))
+                    if (Path.GetExtension(myFile) == ".dll")
                     {
-                        var item = result
-                        .AsEnumerable().Where(a => a["OriginalFileName"].ToString() == info["OriginalFileName"].ToString()
-                         && a["Version"].ToString().ConvertAssemblyVersionToInt() == info["OriginalFileName"].ToString().ConvertAssemblyVersionToInt()).FirstOrDefault();
+                        var info = myFile.GetInfoDLL();
 
-                        DecodeStringBase64ToFile(item["DATA"].ToString(), Dir);
-                        Console.WriteLine(myFile);
+                        if (result
+                            .AsEnumerable()
+                            .Any(a => a["OriginalFileName"].ToString() == info["OriginalFileName"].ToString()
+                             && a["Version"].ToString().ConvertAssemblyVersionToInt() == info["OriginalFileName"].ToString().ConvertAssemblyVersionToInt()))
+                        {
+                            var item = result
+                            .AsEnumerable().Where(a => a["OriginalFileName"].ToString() == info["OriginalFileName"].ToString()
+                             && a["Version"].ToString().ConvertAssemblyVersionToInt() == info["OriginalFileName"].ToString().ConvertAssemblyVersionToInt()).FirstOrDefault();
+
+                            DecodeStringBase64ToFile(item["DATA"].ToString(), Dir);
+                            Console.WriteLine(myFile);
+                        }
                     }
                 }
             }
