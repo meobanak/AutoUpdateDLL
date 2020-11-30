@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -107,7 +108,33 @@ namespace System.CRM
         }
 
 
-        
+        public static Dictionary<string, object> GetInfoDLL(this string path)
+        {
+            Dictionary<string, object> result = new Dictionary<string, object>();
+
+            Assembly assembly = Assembly.LoadFile(path);
+            result["Version"] = assembly.GetName().Version.ToString();
+            result["ProductName"] = assembly.GetName().Name.ToString();
+            result["OriginalFileName"] = assembly.ManifestModule.ToString();
+            result["CreatedDate"] = DateTime.Today;
+            return result;
+        }
+
+
+        public static int ConvertAssemblyVersionToInt(this string param)
+        {
+            int result = 0;
+            if (!String.IsNullOrEmpty(param))
+            {
+                string s = param.Trim().Replace(',', ' ');
+                result = Convert.ToInt32(s);
+            }
+
+            return result;
+        }
+
+
+
 
     }
 }

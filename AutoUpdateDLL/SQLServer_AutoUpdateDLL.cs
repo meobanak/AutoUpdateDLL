@@ -1,6 +1,7 @@
 ﻿using QA.API_WebService;
 using System;
 using System.Collections.Generic;
+using System.CRM;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
@@ -30,15 +31,30 @@ namespace AutoUpdateDLL
             var query = DataQuery.Create("Application", "ws_GetApplicationDLL_List");
             var ds = Database.ProcessRequest(ConnectString, query);
 
+            string[] myFiles = Directory.GetFiles(Dir);
+
             if (ds != null)
             {
                 DataTable result = new DataTable();
-                foreach (DataRow item in result.Rows)
+
+                foreach (string myFile in myFiles)
                 {
-                    DecodeStringBase64ToFile(item["DATA"].ToString(), Dir);
+                    var info = myFile.GetInfoDLL();
+                    
+                    if(result
+                        .AsEnumerable()
+                        .Any(a => a["OriginalFileName"].ToString() == info["OriginalFileName"].ToString() 
+                         && a["Version"].ToString().ConvertAssemblyVersionToInt() == info["OriginalFileName"].ToString().ConvertAssemblyVersionToInt()))
+                    {
+                        var item = result
+                        .AsEnumerable().Where(a => a["OriginalFileName"].ToString() == info["OriginalFileName"].ToString()
+                         && a["Version"].ToString().ConvertAssemblyVersionToInt() == info["OriginalFileName"].ToString().ConvertAssemblyVersionToInt()).FirstOrDefault();
+
+                        DecodeStringBase64ToFile(item["DATA"].ToString(), Dir);
+                        Console.WriteLine(myFile);
+                    }
                 }
             }
-
         }
 
 
