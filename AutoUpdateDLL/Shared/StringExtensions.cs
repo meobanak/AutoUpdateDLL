@@ -127,7 +127,7 @@ namespace System.CRM
             if (!String.IsNullOrEmpty(param))
             {
                 string s = param.Trim().Replace(',', ' ');
-                result = Convert.ToInt32(s);
+                result = Convert.ToInt32(s.Trim());
             }
 
             return result;
