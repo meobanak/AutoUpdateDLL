@@ -11,7 +11,8 @@ namespace AutoUpdateDLL
         static void Main(string[] args)
         {
             string connectString = @"Server=nguyentampc\sqlexpress;Database=Application;User Id=sa;Password=19042015;";
-            IAutoUpdateDLL upd = new SQLServer_AutoUpdateDLL(connectString);
+            string dir = @"D:\test";
+            IAutoUpdateDLL upd = new SQLServer_AutoUpdateDLL(connectString , dir);
             upd.GetDLLs();
         }
     }

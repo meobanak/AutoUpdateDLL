@@ -126,11 +126,25 @@ namespace System.CRM
             int result = 0;
             if (!String.IsNullOrEmpty(param))
             {
-                string s = param.Trim().Replace(',', ' ');
-                result = Convert.ToInt32(s.Trim());
+                string s = param.Trim().Replace('.', ' ').RemoveSpecialCharacters();
+                result = Convert.ToInt32(s);
             }
 
             return result;
+        }
+
+
+        public static string RemoveSpecialCharacters(this string str)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (char c in str)
+            {
+                if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '.' || c == '_')
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString();
         }
 
 

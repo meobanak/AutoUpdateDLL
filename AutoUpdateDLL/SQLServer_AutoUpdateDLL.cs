@@ -31,40 +31,67 @@ namespace AutoUpdateDLL
             var query = DataQuery.Create("Application", "ws_GetApplicationDLL_List");
             var ds = Database.ProcessRequest(ConnectString, query);
 
-            string[] myFiles = Directory.GetFiles(Dir);
-
             if (ds != null)
             {
-                DataTable result = new DataTable();
-
-                foreach (string myFile in myFiles)
+                DataTable result = ds.Tables[0];
+                foreach (DataRow item in result.Rows)
                 {
-                    if (Path.GetExtension(myFile) == ".dll")
+
+                    if (IsUpdate(item))
                     {
-                        var info = myFile.GetInfoDLL();
-
-                        if (result
-                            .AsEnumerable()
-                            .Any(a => a["OriginalFileName"].ToString() == info["OriginalFileName"].ToString()
-                             && a["Version"].ToString().ConvertAssemblyVersionToInt() == info["OriginalFileName"].ToString().ConvertAssemblyVersionToInt()))
-                        {
-                            var item = result
-                            .AsEnumerable().Where(a => a["OriginalFileName"].ToString() == info["OriginalFileName"].ToString()
-                             && a["Version"].ToString().ConvertAssemblyVersionToInt() == info["OriginalFileName"].ToString().ConvertAssemblyVersionToInt()).FirstOrDefault();
-
-                            DecodeStringBase64ToFile(item["DATA"].ToString(), Dir);
-                            Console.WriteLine(myFile);
-                        }
+                        Dictionary<string, object> param = new Dictionary<string, object>();
+                        param["DATA"] = item["DATA"];
+                        param["OriginalFileName"] = item["OriginalFileName"];
+                        DecodeStringBase64ToFile(param, Dir);
                     }
                 }
+
             }
         }
 
-
-        private void DecodeStringBase64ToFile(string b64Str, string path)
+        private bool IsUpdate(DataRow item)
         {
-            Byte[] bytes = Convert.FromBase64String(b64Str);
-            File.WriteAllBytes(path, bytes);
+            string[] myFiles = Directory.GetFiles(Dir);
+            bool IsExist = false;
+            bool IsEqual = false;
+
+            IsExist = myFiles.Any(a => Path.GetExtension(a) == ".dll" && a.GetInfoDLL()["OriginalFileName"].ToString() == item["OriginalFileName"].ToString());
+            if (IsExist)
+                IsEqual = myFiles.Any(a => Path.GetExtension(a) == ".dll" && a.GetInfoDLL()["OriginalFileName"].ToString() == item["OriginalFileName"].ToString()
+                                 && a.GetInfoDLL()["Version"].ToString().ConvertAssemblyVersionToInt() == item["Version"].ToString().ConvertAssemblyVersionToInt());
+
+            if ( !IsExist || ( !IsEqual && IsExist) )
+                return true;
+
+            return false;
+        }
+
+
+        private void DecodeStringBase64ToFile(Dictionary<string, object> param, string path)
+        {
+            string save_path = Path.Combine(path, param["OriginalFileName"].ToString());
+            byte[] bytes = Convert.FromBase64String(param["DATA"].ToString());
+
+            ByteArrayToFile(Path.Combine(path, param["OriginalFileName"].ToString()), bytes);
+
+        }
+
+
+        public bool ByteArrayToFile(string fileName, byte[] byteArray)
+        {
+            try
+            {
+                using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+                {
+                    fs.Write(byteArray, 0, byteArray.Length);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception caught in process: {0}", ex);
+                return false;
+            }
         }
 
 
