@@ -77,7 +77,7 @@ namespace AutoUpdateDLL
         }
 
 
-        public bool ByteArrayToFile(string fileName, byte[] byteArray)
+        private bool ByteArrayToFile(string fileName, byte[] byteArray)
         {
             try
             {
