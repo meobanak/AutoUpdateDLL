@@ -19,9 +19,10 @@ namespace AutoUpdateDLL
         public Form1(string connectString , string dir)
         {
             InitializeComponent();
+            btnStart.Enabled = false;
             IAutoUpdateDLL upd = new SQLServer_AutoUpdateDLL(connectString, dir);
             upd.GetDLLs(progressBar1, txtContent);
-            btnStart.Enabled = false;
+           
             time.Interval = 1000;
             time.Start();
             time.Tick += Time_Tick;
@@ -30,19 +31,20 @@ namespace AutoUpdateDLL
 
         private void Time_Tick(object sender, EventArgs e)
         {
+            btnStart.Enabled = true;
             if (timeLeft > 0)
             {
                 // Display the new time left
                 // by updating the Time Left label.
                 timeLeft = timeLeft - 1;
-                btnStart.Text = "Start(" + timeLeft +")";
+                btnStart.Text = "Start (" + timeLeft +")";
             }
             else
             {
                 // If the user ran out of time, stop the timer, show
                 // a MessageBox, and fill in the answers.
                 time.Stop();
-                btnStart.Enabled = true;
+                btnStart_Click(null, null);
             }
         }
 
