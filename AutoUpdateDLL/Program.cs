@@ -13,9 +13,9 @@ namespace AutoUpdateDLL
         [STAThread]
         static void Main()
         {
-            string connectString = @"Server=nguyentampc\sqlexpress;Database=Application;User Id=sa;Password=19042015;";
-            string dir = @"D:\test";
-            string execappdir = ConfigurationManager.AppSettings["APPLICATIONDIR"].ToString();
+            string connectString = ConfigurationManager.AppSettings["CONNECTSTRINGSQLSERVER"].ToString();
+            string dir = ConfigurationManager.AppSettings["DIRECTORY"].ToString();
+            string execappdir = ConfigurationManager.AppSettings["APPLICATION"].ToString();
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
