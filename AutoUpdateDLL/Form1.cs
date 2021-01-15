@@ -16,10 +16,12 @@ namespace AutoUpdateDLL
     {
         private Timer time = new Timer();
         private int timeLeft = 5;
-        public Form1(string connectString , string dir)
+        private string appdir;
+        public Form1(string connectString , string dir , string execappdir)
         {
             InitializeComponent();
             btnStart.Enabled = false;
+            appdir = execappdir;
             IAutoUpdateDLL upd = new SQLServer_AutoUpdateDLL(connectString, dir);
             upd.GetDLLs(progressBar1, txtContent);
            
@@ -27,6 +29,15 @@ namespace AutoUpdateDLL
             time.Start();
             time.Tick += Time_Tick;
 
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == (Keys.Enter) && btnStart.Enabled)
+            {
+                btnStart_Click(null, null);
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         private void Time_Tick(object sender, EventArgs e)
@@ -50,7 +61,6 @@ namespace AutoUpdateDLL
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            string appdir = ConfigurationManager.AppSettings["APPLICATIONDIR"].ToString() ;
             try
             {
                 Process.Start(appdir);
