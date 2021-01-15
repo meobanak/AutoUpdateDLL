@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using WebService;
 
 namespace AutoUpdateDLL
@@ -26,7 +27,7 @@ namespace AutoUpdateDLL
                 Dir = Directory.GetCurrentDirectory();
         }
 
-        public void GetDLLs()
+        public void GetDLLs(ProgressBar progbar , RichTextBox content)
         {
             var query = DataQuery.Create("Application", "ws_GetApplicationDLL_List");
             var ds = Database.ProcessRequest(ConnectString, query);
@@ -34,20 +35,32 @@ namespace AutoUpdateDLL
             if (ds != null)
             {
                 DataTable result = ds.Tables[0];
+                progbar.Maximum = result.Rows.Count;
+                int i = 0;
                 foreach (DataRow item in result.Rows)
                 {
-
                     if (IsUpdate(item))
                     {
                         Dictionary<string, object> param = new Dictionary<string, object>();
                         param["DATA"] = item["DATA"];
                         param["OriginalFileName"] = item["OriginalFileName"];
                         DecodeStringBase64ToFile(param, Dir);
+                        content.Text += item["OriginalFileName"].ToString() + ": updated" +"\n" ; 
+
+
                     }
+                    else
+                    {
+                        content.Text += item["OriginalFileName"].ToString() + ": same version" + "\n";
+                    }    
+                    progbar.Increment(i);
+                    i++;
                 }
 
             }
         }
+
+        
 
         private bool IsUpdate(DataRow item)
         {
